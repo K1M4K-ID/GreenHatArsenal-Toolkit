@@ -11,15 +11,7 @@
 
 host=$(hostname)
 path=$(pwd)
-mypath="${path}/Malware"
-
-# Date and time
-# -------------
-bul=$(date +"%B")
-tan=$(date +"%d")
-tim=$(date +"%T")
-yer=$(date +"%Y")
-waktu=$(printf "\033[31;1m$bul \033[31;1m$tan \033[37;1m$tim \033[31;1m$yer")
+mypath="${path}/tmp"
 
 # Clear screen and hide cursor
 # ----------------------------
@@ -60,7 +52,7 @@ Kali Linux, Parrot Os, Ubuntu
 
 Let's check if you have installed what script needs
     """
-    printf "\033[37;1m"
+    printf "\033[37;3m"
     tools_ok=1
 
     essential_tools_names=(
@@ -82,10 +74,11 @@ Let's check if you have installed what script needs
         "mitmproxy"
         "bettercap"
         "ettercap"
+        "nmap"
     )
 
     for tool in "${essential_tools_names[@]}"; do
-        printf "%-15s" "$tool"
+        printf "\033[37;3m%-15s" "$tool"
         
         if command -v "$tool" &>/dev/null; then
             echo -e "\033[32;3m [OK]\e[0m"
@@ -128,8 +121,10 @@ Let's check if you have installed what script needs
         printf "\033[32;2m\n"
         animate """
 Certain features may not work without them.
+Make sure you have installed all the dependencies needed to run the script
 ****************************************************************************
-                                [Enter] to continue & Ctrl+C to stop program
+[Enter] to continue & Ctrl+C to stop program
+
 """
 read x
 clear
@@ -181,9 +176,9 @@ animate() {
 
 # Fancy menu prompt
 prompt() {
-    printf "\033[1;32m"
+    printf "\033[32;3m"
     read -p "> " user_input
-    printf "\033[0m"
+    printf "\033[32;3m"
 }
 
 # Menu functions with animations
@@ -194,18 +189,104 @@ menu1() {
     banner
     animate_menu "Reconnaissance Menu"
     animate """
-    [1]. Scanning Based on Name
-    [2]. Scanning Victim's Network {Wireless}
-    [3]. Scanning Vulnerabilities on Windows 7
-    [4]. Scanning Vulnerabilities on Windows 10
-    [5]. Scanning Social Media
-    [6]. Whois Scanning
-    [7]. Host Scanning
+    [1]. Scanning Vulnerabilities on Windows 7
+    [2]. Scanning Vulnerabilities on Windows 10
     [x]. Back
     """
     prompt
+    case $user_input in
+            1) scan_vulnerability_windows7;;
+            2) scan_vulnerability_windows10;;
+            x) break ;;
+            *) animate "Invalid choice. Please try again." ;;
+    esac
+}
+# Fungsi scanning vulnerability Windows 7
+scan_vulnerability_windows7() {
+    clear
+    banner
+    animate_menu "Scanning Vulnerabilities on Windows 7"
+    animate "Enter target IP address:"
+    prompt
+
+    target="$user_input"
+
+    animate "Running Nmap script smb-vuln-ms17-010 on $target..."
+    sleep 1
+
+    # Menjalankan Nmap script smb-vuln-ms17-010
+    nmap_result=$(nmap -p445 --script smb-vuln-ms17-010 "$target")
+
+    # Menampilkan hasil scanning
+    echo -e "\nNmap Scan Results for $target:\n"
+    echo "$nmap_result"
+
+    animate "Scanning completed."
+
+    # Memberikan opsi untuk melanjutkan atau kembali ke menu reconnaissance
+    animate "Options:"
+    animate "[1]. Continue scanning"
+    animate "[2]. Back to reconnaissance menu"
+    prompt
+
+    case $user_input in
+        1)
+            scan_vulnerability_windows7
+            ;;
+        2)
+            menu1
+            ;;
+        *)
+            animate "Invalid choice. Returning to reconnaissance menu."
+            sleep 1;clear
+            menu1
+            ;;
+    esac
 }
 
+# Fungsi scanning vulnerability Windows 10
+scan_vulnerability_windows10() {
+    clear
+    banner
+    animate_menu "Scanning Vulnerabilities on Windows 10"
+    animate "Enter target IP address:"
+    prompt
+
+    target="$user_input"
+
+    animate "Running Nmap script smb-vuln* on $target..."
+    sleep 1
+
+    # Menjalankan Nmap script smb-vuln*
+    nmap_result=$(nmap --script smb-vuln* "$target")
+
+    # Menampilkan hasil scanning
+    echo -e "\nNmap Scan Results for $target:\n"
+    echo "$nmap_result"
+
+    animate "Scanning completed."
+
+    # Memberikan opsi untuk melanjutkan atau kembali ke menu reconnaissance
+    animate "Options:"
+    animate "[1]. Continue scanning"
+    animate "[2]. Back to reconnaissance menu"
+    prompt
+
+    case $user_input in
+        1)
+            scan_vulnerability_windows10
+            ;;
+        2)
+            menu1
+            ;;
+        *)
+            animate "Invalid choice. Returning to reconnaissance menu."
+            sleep 1;clear
+            menu1
+            ;;
+    esac
+}
+# web aplication testing menu
 menu2() {
     animate "Loading web application testing tools..."
     sleep 1
@@ -225,7 +306,91 @@ menu2() {
     [x]. Back
     """
     prompt
+
+    case $user_input in
+        1) scan_url_dirsearch ;;
+        2) cmseek_tool ;;
+        3) whatweb_tool ;;
+        4) automated_sql_injection ;;
+        5) sqlmap_tool ;;
+        6) subdomain_enumeration ;;
+        7) waf_detection ;;
+        8) aws_reconnaissance ;;
+        9) dos_attack_hardening ;;
+        x) exit ;;
+        *) animate "Invalid choice. Please try again." ;;
+    esac
 }
+
+# Fungsi untuk mengecek dan menginstal Dirsearch
+check_and_install_dirsearch() {
+    if command -v "dirsearch" &>/dev/null; then
+        #animate "Dirsearch is already installed."
+        sleep 0.1
+    else
+        animate "Dirsearch is not found. Installing..."
+        git clone https://github.com/maurosoria/dirsearch.git
+        cd dirsearch || exit
+        chmod +x dirsearch.py
+        ln -s "$(pwd)/dirsearch.py" /usr/local/bin/dirsearch
+        cd - ;rm -fr dirsearch || exit
+        sleep 1
+        animate "Dirsearch has been installed successfully."
+    fi
+}
+
+# Fungsi scanning URL menggunakan Dirsearch
+scan_url_dirsearch() {
+    clear
+    banner
+    animate_menu "Dirsearch - Scanning URL"
+    animate "Enter target URL (e.g., http://example.com):"
+    prompt
+
+    target_url="$user_input"
+
+    # Menjalankan Dirsearch
+    animate "Running Dirsearch on $target_url..."
+    check_and_install_dirsearch
+    sleep 1
+
+    dirsearch_result=$(dirsearch -u "$target_url")
+
+    # Menampilkan hasil scanning
+    echo -e "\nDirsearch Results for $target_url:\n"
+    echo "$dirsearch_result"
+
+    animate "Scanning completed."
+
+    # Memberikan opsi untuk melanjutkan atau kembali ke menu web application testing
+    animate "Options:"
+    animate "[1]. Continue scanning"
+    animate "[2]. Back to web application testing menu"
+    prompt
+
+    case $user_input in
+        1)
+            scan_url_dirsearch
+            ;;
+        2)
+            menu2
+            ;;
+        *)
+            animate "Invalid choice. Returning to web application testing menu."
+            sleep 1;clear
+            menu2
+            ;;
+    esac
+}
+
+
+
+
+
+
+
+
+
 
 menu3() {
     animate "Loading Android hacking options..."
@@ -234,10 +399,12 @@ menu3() {
     banner
     animate_menu "Android Hacking Menu"
     animate """
-    [1]. Inject Android Payload
+    [1]. Android Payload
     [2]. Inject Android Payload from File
     [3]. Manual Android Payload Injection
-    [4]. Create Listener
+    --------------------------------------
+    [4]. Windows Payload To Bypass Windows Defender
+    [5]. Create Listerner
     [x]. Back
     """
     prompt
