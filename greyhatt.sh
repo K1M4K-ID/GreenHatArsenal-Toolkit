@@ -161,6 +161,16 @@ GHAT is intended for ethical hackers, or hackers who use their skills for good.
 
 }
 
+# Fungsi untuk menangani sinyal Ctrl+C
+trap_ctrl_c() {
+    clear
+    sleep 1
+    animate "Anda telah menekan Ctrl+C. Kembali ke menu utama..."
+    sleep 1
+    run
+}
+
+
 # Fungsi animasi teks
 animate_text() {
     local text="$1"
@@ -629,6 +639,43 @@ waf_detection() {
 }
 
 
+# Fungsi untuk memeriksa dan mengunduh Doss-Attack jika belum terinstal
+check_and_install_doss_attack() {
+    if [ ! -d "tmp/Doss-Attack" ]; then
+        animate "Mengunduh Doss-Attack..."
+        git clone https://github.com/K1M4K-ID/Doss-Attack.git; sleep 1; mv -f Doss-Attack tmp &> /dev/null
+        animate "Doss-Attack telah berhasil diunduh."
+    fi
+}
+
+# Fungsi untuk Serangan DoS - Pengerasan
+dos_attack_hardening() {
+    clear
+    banner
+    animate_menu "Serangan DoS - Pengerasan dengan Doss-Attack"
+
+    # Memeriksa dan mengunduh Doss-Attack jika belum terinstal
+    check_and_install_doss_attack
+    sleep 1
+
+    # Menjalankan Doss-Attack dengan opsi yang sesuai
+    bash tmp/Doss-Attack/startDOS.sh
+
+    animate "Serangan DoS - Pengerasan selesai."
+
+    # Memberikan opsi untuk melanjutkan atau kembali ke menu pengujian aplikasi web
+    printf "\n"
+    animate "Opsi:"
+    animate "[1]. Lanjutkan serangan"
+    animate "[2]. Kembali ke menu pengujian aplikasi web"
+    prompt
+
+    case $user_input in
+        1) dos_attack_hardening ;;
+        2) menu2 ;;
+        *) animate "Pilihan tidak valid. Kembali ke menu pengujian aplikasi web." ;;
+    esac
+}
 
 
 
@@ -686,6 +733,9 @@ sleep 1
 
 # Periksa alat
 check_tools
+
+# Menambahkan trap untuk menangani Ctrl+C
+trap trap_ctrl_c INT
 
 # Jalankan menu utama
 run
