@@ -1108,7 +1108,7 @@ run() {
             5) menu5 ;;
             6) menu6 ;;
             7) menu7 ;;
-            x) break;exit 1 ;;
+            x) break;;
             *) animate "Pilihan tidak valid. Harap coba lagi." ;;
         esac
     done
