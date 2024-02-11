@@ -1,5 +1,5 @@
 # GreenHatArsenal-Toolkit
-Green Hat Arsenal Toolkit merupakan kumpulan alat keamanan yang berguna untuk menguji dan mengevaluasi kerentanan sistem dan aplikasi. Tools ini dirancang untuk membantu profesional keamanan informasi dalam melakukan pengujian penetrasi, analisis kerentanan, dan tindakan lainnya yang bertujuan untuk meningkatkan keamanan sistem dan infrastruktur IT. Dengan menggunakan Green Hat Arsenal Toolkit, pengguna dapat melakukan penilaian keamanan secara komprehensif dan mengidentifikasi area-area yang rentan terhadap serangan, sehingga memungkinkan untuk melakukan perbaikan dan peningkatan keamanan yang sesuai.
+<p>Green Hat Arsenal Toolkit merupakan kumpulan alat keamanan yang berguna untuk menguji dan mengevaluasi kerentanan sistem dan aplikasi. Tools ini dirancang untuk membantu profesional keamanan informasi dalam melakukan pengujian penetrasi, analisis kerentanan, dan tindakan lainnya yang bertujuan untuk meningkatkan keamanan sistem dan infrastruktur IT. Dengan menggunakan Green Hat Arsenal Toolkit, pengguna dapat melakukan penilaian keamanan secara komprehensif dan mengidentifikasi area-area yang rentan terhadap serangan, sehingga memungkinkan untuk melakukan perbaikan dan peningkatan keamanan yang sesuai.</p>
 
 ```
 Author : K1M4K-ID Founder { HRA - Human Cyber Security }
