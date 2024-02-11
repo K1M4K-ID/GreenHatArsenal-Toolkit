@@ -14,9 +14,6 @@ Green Hat Arsenal Toolkit adalah kumpulan alat keamanan yang bertujuan untuk men
 
 Green Hat Arsenal Toolkit adalah alat yang sangat berharga bagi profesional keamanan informasi untuk membantu mereka melindungi sistem dan aplikasi dari ancaman keamanan yang ada dan potensial.
 
-```
-Author : K1M4K-ID Founder { HRA - Human Cyber Security }
-```
 
 # ScreenShoot
 <img src="/images/1.jpg" alt="menu" style="width:400px;height:310px;"> <img src="/images/2.jpg" alt="information gathering" style="width:400px;height:310px;">
