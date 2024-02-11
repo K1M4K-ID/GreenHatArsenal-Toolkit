@@ -1,14 +1,3 @@
-# GreenHatArsenal-Toolkit
-<p>Green Hat Arsenal Toolkit merupakan kumpulan alat keamanan yang berguna untuk menguji dan mengevaluasi kerentanan sistem dan aplikasi. Tools ini dirancang untuk membantu profesional keamanan informasi dalam melakukan pengujian penetrasi, analisis kerentanan, dan tindakan lainnya yang bertujuan untuk meningkatkan keamanan sistem dan infrastruktur IT. Dengan menggunakan Green Hat Arsenal Toolkit, pengguna dapat melakukan penilaian keamanan secara komprehensif dan mengidentifikasi area-area yang rentan terhadap serangan, sehingga memungkinkan untuk melakukan perbaikan dan peningkatan keamanan yang sesuai.</p>
-
-```
-Author : K1M4K-ID Founder { HRA - Human Cyber Security }
-```
-
-# ScreenShoot
-<img src="/images/1.jpg" alt="menu" style="width:400px;height:310px;"> <img src="/images/2.jpg" alt="information gathering" style="width:400px;height:310px;">
-<img src="/images/5.jpg" alt="exploit attack" style="width:400px;height:310px;"> <img src="/images/4.jpg" alt="web attack" style="width:400px;height:310px;">
-
 ## Green Hat Arsenal Toolkit
 
 Green Hat Arsenal Toolkit adalah kumpulan alat keamanan yang bertujuan untuk menguji dan mengevaluasi kerentanan sistem dan aplikasi. Alat-alat ini dirancang khusus untuk membantu para profesional keamanan informasi dalam melakukan pengujian penetrasi, analisis kerentanan, dan langkah-langkah lainnya untuk meningkatkan keamanan sistem dan infrastruktur TI.
@@ -24,4 +13,13 @@ Green Hat Arsenal Toolkit adalah kumpulan alat keamanan yang bertujuan untuk men
 - **Peningkatan Keamanan**: Membantu organisasi dalam melakukan perbaikan dan peningkatan keamanan yang sesuai berdasarkan temuan dari pengujian keamanan.
 
 Green Hat Arsenal Toolkit adalah alat yang sangat berharga bagi profesional keamanan informasi untuk membantu mereka melindungi sistem dan aplikasi dari ancaman keamanan yang ada dan potensial.
+
+```
+Author : K1M4K-ID Founder { HRA - Human Cyber Security }
+```
+
+# ScreenShoot
+<img src="/images/1.jpg" alt="menu" style="width:400px;height:310px;"> <img src="/images/2.jpg" alt="information gathering" style="width:400px;height:310px;">
+<img src="/images/5.jpg" alt="exploit attack" style="width:400px;height:310px;"> <img src="/images/4.jpg" alt="web attack" style="width:400px;height:310px;">
+
 
